@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumen Health · Virtual Care Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+
+<!-- ============================================================
+     AMPLITUDE — STEP 1: Analytics (Browser SDK)
+     Replace AMPLITUDE_API_KEY below with your DEMO ORG api key.
+     ============================================================ -->
+<script src="https://cdn.amplitude.com/libs/analytics-browser-2.11.1-min.js.gz"></script>
+
+<!-- ============================================================
+     AMPLITUDE — STEP 2: Guides and Surveys (Engagement SDK)
+     IMPORTANT: copy the EXACT install snippet from your org:
+     Amplitude → Guides and Surveys → Settings → Installation.
+     The line below uses the standard CDN path; if your org's
+     snippet differs, paste it over this one.
+     ============================================================ -->
+<script src="https://cdn.amplitude.com/script/76b86a176df6eb2efdedf66f242a096f.engagement.js"></script>
+
+<style>
+:root{
+  --ink:#1c1530;
+  --ink-soft:#4d4663;
+  --ink-faint:#8b86a0;
+  --plum:#3d2a7d;        /* primary — deep clinical violet */
+  --plum-bright:#5b3df0;
+  --plum-wash:#efebfc;
+  --teal:#0e8f7e;
+  --teal-wash:#e3f5f1;
+  --amber:#b97309;
+  --amber-wash:#fdf3e0;
+  --rose:#c2354f;
+  --rose-wash:#fdeaee;
+  --paper:#f7f6fb;
+  --card:#ffffff;
+  --line:#e7e4f0;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(28,21,48,.05),0 8px 24px -12px rgba(61,42,125,.18);
+  --font:'Hanken Grotesk',sans-serif;
+  --display:'Fraunces',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:15px}
+body{font-family:var(--font);background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+/* ---------- top bar ---------- */
+.topbar{display:flex;align-items:center;gap:20px;background:#fff;border-bottom:1px solid var(--line);padding:0 22px;height:58px;position:sticky;top:0;z-index:40}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;letter-spacing:-.01em}
+.brand-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--plum) 0%,var(--plum-bright) 100%);display:grid;place-items:center;color:#fff;font-family:var(--display);font-size:.95rem}
+.brand small{display:block;font-weight:500;font-size:.66rem;color:var(--ink-faint);letter-spacing:.08em;text-transform:uppercase}
+.topbar .spacer{flex:1}
+.env-chip{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--amber-wash);color:var(--amber);border:1px solid #f3dfb7;padding:4px 9px;border-radius:999px}
+.select-wrap{display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--ink-soft);font-weight:600}
+.select-wrap select{font-family:var(--font);font-size:.85rem;font-weight:600;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:9px;padding:6px 10px;cursor:pointer}
+.select-wrap select:focus{outline:2px solid var(--plum-bright);outline-offset:1px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--teal-wash);color:var(--teal);display:grid;place-items:center;font-weight:800;font-size:.8rem;border:1.5px solid #c8e9e2}
+
+/* ---------- layout ---------- */
+.shell{display:flex;flex:1;min-height:0}
+.sidenav{width:212px;background:#fff;border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:2px}
+.sidenav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;color:var(--ink-soft);text-decoration:none;font-weight:600;font-size:.88rem;transition:background .15s,color .15s}
+.sidenav a svg{width:17px;height:17px;stroke-width:2}
+.sidenav a:hover{background:var(--paper);color:var(--ink)}
+.sidenav a.active{background:var(--plum-wash);color:var(--plum)}
+.sidenav .nav-label{font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);padding:14px 12px 5px}
+main{flex:1;padding:26px 30px 60px;max-width:1180px}
+
+/* ---------- page head ---------- */
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;gap:16px;flex-wrap:wrap}
+.page-head h1{font-family:var(--display);font-weight:700;font-size:1.7rem;letter-spacing:-.01em}
+.page-head p{color:var(--ink-faint);font-size:.86rem;margin-top:3px}
+.actions{display:flex;gap:10px;align-items:center}
+.btn{font-family:var(--font);font-weight:700;font-size:.86rem;border-radius:10px;padding:9px 16px;cursor:pointer;border:1.5px solid transparent;display:inline-flex;align-items:center;gap:8px;transition:transform .12s,box-shadow .12s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--plum);color:#fff;box-shadow:0 4px 14px -4px rgba(61,42,125,.5)}
+.btn-primary:hover{background:#332368}
+.btn-ghost{background:#fff;border-color:var(--line);color:var(--ink-soft)}
+.btn-ghost:hover{border-color:var(--plum-bright);color:var(--plum)}
+.btn-icon{padding:9px 11px}
+
+/* ---------- stat cards ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat::after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px}
+.stat.s-plum::after{background:var(--plum-bright)}
+.stat.s-teal::after{background:var(--teal)}
+.stat.s-amber::after{background:var(--amber)}
+.stat.s-rose::after{background:var(--rose)}
+.stat .label{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint)}
+.stat .value{font-family:var(--display);font-size:1.85rem;font-weight:700;margin-top:6px}
+.stat .delta{font-size:.74rem;font-weight:600;margin-top:4px;color:var(--teal)}
+.stat .delta.down{color:var(--rose)}
+
+/* ---------- panels ---------- */
+.grid{display:grid;grid-template-columns:1.65fr 1fr;gap:18px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--line)}
+.panel-head h2{font-size:.98rem;font-weight:800;letter-spacing:-.01em}
+.panel-head .hint{font-size:.74rem;color:var(--ink-faint)}
+
+/* ---------- queue table ---------- */
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th{text-align:left;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);padding:11px 18px;border-bottom:1px solid var(--line)}
+td{padding:13px 18px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .12s}
+tbody tr:hover{background:#fbfaff}
+.pt{display:flex;align-items:center;gap:11px}
+.pt .dot{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.72rem}
+.pt .meta b{display:block;font-weight:700}
+.pt .meta span{font-size:.74rem;color:var(--ink-faint)}
+.tag{font-size:.7rem;font-weight:700;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.tag.wait{background:var(--amber-wash);color:var(--amber)}
+.tag.ready{background:var(--teal-wash);color:var(--teal)}
+.tag.urgent{background:var(--rose-wash);color:var(--rose)}
+.row-act{display:flex;gap:8px;justify-content:flex-end}
+.mini{font-size:.78rem;font-weight:700;padding:7px 12px;border-radius:8px;border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer}
+.mini:hover{border-color:var(--plum-bright);color:var(--plum)}
+.mini.go{background:var(--plum);border-color:var(--plum);color:#fff}
+.mini.go:hover{background:#332368;color:#fff}
+
+/* ---------- schedule ---------- */
+.sched{list-style:none;padding:8px 0}
+.sched li{display:flex;gap:14px;padding:12px 18px;align-items:flex-start}
+.sched time{font-variant-numeric:tabular-nums;font-weight:800;font-size:.8rem;color:var(--plum);background:var(--plum-wash);border-radius:8px;padding:5px 8px;white-space:nowrap}
+.sched b{display:block;font-size:.87rem}
+.sched span{font-size:.76rem;color:var(--ink-faint)}
+
+/* ---------- footer / demo strip ---------- */
+.demo-strip{position:fixed;bottom:0;left:0;right:0;background:var(--ink);color:#cfc8e8;font-size:.74rem;display:flex;align-items:center;gap:18px;padding:8px 18px;z-index:50}
+.demo-strip b{color:#fff}
+.demo-strip button{margin-left:auto;font-family:var(--font);font-size:.72rem;font-weight:700;background:transparent;color:#cfc8e8;border:1px solid #4d4663;border-radius:7px;padding:5px 10px;cursor:pointer}
+.demo-strip button:hover{color:#fff;border-color:#8b86a0}
+#amp-status{display:inline-flex;align-items:center;gap:6px}
+#amp-status .led{width:8px;height:8px;border-radius:50%;background:var(--rose)}
+#amp-status.on .led{background:#3ddc97}
+
+.toast{position:fixed;bottom:54px;right:22px;background:var(--ink);color:#fff;font-size:.82rem;font-weight:600;padding:11px 16px;border-radius:11px;box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;transform:translateY(8px);transition:all .25s;z-index:60}
+.toast.show{opacity:1;transform:translateY(0)}
+
+@media(max-width:980px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.sidenav{display:none}}
+</style>
+</head>
+<body>
+
+<header class="topbar" data-guide-target="topbar">
+  <div class="brand">
+    <div class="brand-mark">L</div>
+    <div>Lumen Health<small>Virtual Care Console</small></div>
+  </div>
+  <span class="env-chip">Demo environment · fictitious data</span>
+  <div class="spacer"></div>
+
+  <!-- Role switcher: sets Amplitude user property `role` (drives role-based guide targeting) -->
+  <label class="select-wrap" data-guide-target="role-switcher">
+    Role
+    <select id="role-select">
+      <option value="care_coordinator">Care Coordinator</option>
+      <option value="physician">Physician</option>
+      <option value="site_admin">Site Admin</option>
+    </select>
+  </label>
+
+  <!-- Language toggle: sets `language` user property (localization talking point) -->
+  <label class="select-wrap" data-guide-target="language-toggle">
+    <select id="lang-select">
+      <option value="en">EN</option>
+      <option value="es">ES</option>
+    </select>
+  </label>
+
+  <div class="avatar" data-guide-target="profile">NJ</div>
+</header>
+
+<div class="shell">
+  <nav class="sidenav" data-guide-target="sidenav">
+    <div class="nav-label">Care delivery</div>
+    <a href="#" class="active" data-guide-target="nav-dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</a>
+    <a href="#" data-guide-target="nav-queue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Patient Queue</a>
+    <a href="#" data-guide-target="nav-schedule"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Schedule</a>
+    <a href="#" data-guide-target="nav-visits"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Virtual Visits</a>
+    <div class="nav-label">Operations</div>
+    <a href="#" data-guide-target="nav-reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports</a>
+    <a href="#" data-guide-target="nav-settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a>
+  </nav>
+
+  <main>
+    <div class="page-head">
+      <div>
+        <h1 id="greeting">Good morning, Navjo</h1>
+        <p id="today-line">Riverside Medical Center · Friday, June 5</p>
+      </div>
+      <div class="actions">
+        <!-- "Commonly missed feature" — ideal hotspot/tooltip target -->
+        <button class="btn btn-ghost btn-icon" id="btn-templates" data-guide-target="note-templates" title="Note templates">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Note templates
+        </button>
+        <button class="btn btn-ghost" id="btn-export" data-guide-target="bulk-export">Export report</button>
+        <button class="btn btn-primary" id="btn-new-visit" data-guide-target="start-visit">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Start virtual visit
+        </button>
+      </div>
+    </div>
+
+    <section class="stats" data-guide-target="kpi-row">
+      <div class="stat s-plum" data-guide-target="kpi-waiting"><div class="label">Patients waiting</div><div class="value">6</div><div class="delta">↓ 2 vs. this time yesterday</div></div>
+      <div class="stat s-teal" data-guide-target="kpi-visits"><div class="label">Visits completed today</div><div class="value">18</div><div class="delta">↑ 12% week over week</div></div>
+      <div class="stat s-amber" data-guide-target="kpi-wait-time"><div class="label">Avg. wait time</div><div class="value">4:32</div><div class="delta down">↑ 0:41 vs. target</div></div>
+      <div class="stat s-rose" data-guide-target="kpi-followups"><div class="label">Follow-ups due</div><div class="value">9</div><div class="delta down">3 overdue</div></div>
+    </section>
+
+    <div class="grid">
+      <section class="panel" data-guide-target="patient-queue">
+        <div class="panel-head">
+          <h2>Patient queue</h2>
+          <span class="hint">Auto-refreshes every 30s</span>
+        </div>
+        <table>
+          <thead><tr><th>Patient</th><th>Reason</th><th>Waiting</th><th>Status</th><th></th></tr></thead>
+          <tbody id="queue-body">
+            <tr>
+              <td><div class="pt"><div class="dot" style="background:var(--plum-wash);color:var(--plum)">TP</div><div class="meta"><b>Test Patient One</b><span>MRN-000041 · she/her</span></div></div></td>
+              <td>Post-op check-in</td><td>02:14</td><td><span class="tag ready">Ready</span></td>
+              <td><div class="row-act"><button class="mini" data-act="chart">Chart</button><button class="mini go" data-act="join" data-guide-target="join-visit-row1">Join</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="pt"><div class="dot" style="background:var(--teal-wash);color:var(--teal)">SD</div><div class="meta"><b>Sample Demopatient</b><span>MRN-000042 · he/him</span></div></div></td>
+              <td>Medication review</td><td>05:48</td><td><span class="tag wait">Waiting</span></td>
+              <td><div class="row-act"><button class="mini" data-act="chart">Chart</button><button class="mini go" data-act="join">Join</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="pt"><div class="dot" style="background:var(--rose-wash);color:var(--rose)">FE</div><div class="meta"><b>Fict. Example</b><span>MRN-000043 · they/them</span></div></div></td>
+              <td>Chest discomfort triage</td><td>00:51</td><td><span class="tag urgent">Urgent</span></td>
+              <td><div class="row-act"><button class="mini" data-act="chart">Chart</button><button class="mini go" data-act="join">Join</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="pt"><div class="dot" style="background:var(--amber-wash);color:var(--amber)">DU</div><div class="meta"><b>Demo User Four</b><span>MRN-000044 · she/her</span></div></div></td>
+              <td>Diabetes follow-up</td><td>09:12</td><td><span class="tag wait">Waiting</span></td>
+              <td><div class="row-act"><button class="mini" data-act="chart">Chart</button><button class="mini go" data-act="join">Join</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel" data-guide-target="todays-schedule">
+        <div class="panel-head"><h2>Today's schedule</h2><span class="hint">4 remaining</span></div>
+        <ul class="sched">
+          <li><time>11:30</time><div><b>Cardiology consult</b><span>Dr. Imani Okafor · Tele-ICU Room 2</span></div></li>
+          <li><time>12:15</time><div><b>Discharge planning huddle</b><span>Care team · East wing</span></div></li>
+          <li><time>13:00</time><div><b>Remote patient monitoring review</b><span>9 enrolled patients flagged</span></div></li>
+          <li><time>14:45</time><div><b>Behavioral health intake</b><span>Translator requested (ES)</span></div></li>
+        </ul>
+        <div class="panel-head" style="border-top:1px solid var(--line);border-bottom:none">
+          <h2 style="font-size:.85rem">Survey anchor</h2>
+          <span class="hint" data-guide-target="survey-anchor">end-of-shift feedback lives here</span>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="demo-strip">
+  <span id="amp-status"><span class="led"></span><span id="amp-status-text">Amplitude: not connected — set your API key</span></span>
+  <span>Role: <b id="role-echo">care_coordinator</b></span>
+  <span>User: <b id="user-echo">—</b></span>
+  <button id="btn-reset">Reset first-visit state</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =================================================================
+   AMPLITUDE CONFIG — the only two lines you must edit
+   ================================================================= */
+const AMPLITUDE_API_KEY = "76b86a176df6eb2efdedf66f242a096f";
+const SERVER_ZONE = "US"; // or "EU"
+
+/* =================================================================
+   Init: Browser SDK + Engagement (Guides and Surveys) plugin
+   ================================================================= */
+const ampReady = AMPLITUDE_API_KEY !== "REPLACE_WITH_YOUR_DEMO_ORG_KEY";
+let userId = localStorage.getItem("demo_user_id");
+if (!userId) {
+  userId = "demo-user-" + Math.random().toString(36).slice(2, 8);
+  localStorage.setItem("demo_user_id", userId);
+}
+
+if (ampReady && window.amplitude) {
+  amplitude.init(AMPLITUDE_API_KEY, userId, {
+    serverZone: SERVER_ZONE,
+    autocapture: { elementInteractions: true } // page views, sessions, clicks
+  });
+  // Attach Guides and Surveys. If your org's installation snippet
+  // differs, replace this block with the snippet from:
+  // Amplitude → Guides and Surveys → Settings → Installation
+  if (window.engagement) {
+    amplitude.add(window.engagement.plugin());
+  }
+  document.getElementById("amp-status").classList.add("on");
+  document.getElementById("amp-status-text").textContent = "Amplitude: connected";
+}
+document.getElementById("user-echo").textContent = userId;
+
+function track(name, props = {}) {
+  if (ampReady && window.amplitude) amplitude.track(name, props);
+  console.log("[amplitude]", name, props);
+}
+function setUserProp(key, value) {
+  if (ampReady && window.amplitude) {
+    const identify = new amplitude.Identify().set(key, value);
+    amplitude.identify(identify);
+  }
+  console.log("[amplitude identify]", key, "=", value);
+}
+
+/* =================================================================
+   Demo interactions (each one fires a clean event you can show
+   in Amplitude alongside guide events — "one data model")
+   ================================================================= */
+const toast = (msg) => {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._h);
+  t._h = setTimeout(() => t.classList.remove("show"), 2400);
+};
+
+// Role switcher → user property `role` (powers role-based guide targeting)
+const roleSelect = document.getElementById("role-select");
+const savedRole = localStorage.getItem("demo_role") || "care_coordinator";
+roleSelect.value = savedRole;
+document.getElementById("role-echo").textContent = savedRole;
+setUserProp("role", savedRole);
+
+roleSelect.addEventListener("change", () => {
+  const role = roleSelect.value;
+  localStorage.setItem("demo_role", role);
+  document.getElementById("role-echo").textContent = role;
+  setUserProp("role", role);
+  track("Role Selected", { role });
+  toast("Role set to " + role.replaceAll("_", " ") + " — role-targeted guides will re-evaluate");
+});
+
+// Language toggle → user property `language` (localization talking point)
+document.getElementById("lang-select").addEventListener("change", (e) => {
+  setUserProp("language", e.target.value);
+  track("Language Changed", { language: e.target.value });
+  toast("Language preference: " + e.target.value.toUpperCase());
+});
+
+// Primary workflow events
+document.getElementById("btn-new-visit").addEventListener("click", () => {
+  track("Virtual Visit Started", { source: "dashboard_header" });
+  toast("Virtual visit started (event sent)");
+});
+document.getElementById("btn-templates").addEventListener("click", () => {
+  track("Note Templates Opened");
+  toast("Note templates opened — the classic 'missed feature'");
+});
+document.getElementById("btn-export").addEventListener("click", () => {
+  track("Report Exported", { report: "daily_operations" });
+  toast("Report export queued (event sent)");
+});
+document.querySelectorAll(".mini").forEach((b) => {
+  b.addEventListener("click", () => {
+    const act = b.dataset.act === "join" ? "Visit Joined From Queue" : "Patient Chart Opened";
+    track(act);
+    toast(act + " (event sent)");
+  });
+});
+
+track("Dashboard Viewed", { product: "virtual_care_console" });
+
+/* =================================================================
+   Demo controls: reset "first visit" so first-login guides re-fire
+   live on stage. Resets the demo user id → Amplitude sees a brand
+   new user, so any guide targeted to "new users / first session"
+   triggers again.
+   ================================================================= */
+document.getElementById("btn-reset").addEventListener("click", () => {
+  localStorage.removeItem("demo_user_id");
+  localStorage.removeItem("demo_role");
+  if (ampReady && window.amplitude) amplitude.reset();
+  toast("First-visit state cleared — reloading as a brand-new user…");
+  setTimeout(() => location.reload(), 900);
+});
+
+// Time-of-day greeting
+const h = new Date().getHours();
+document.getElementById("greeting").textContent =
+  (h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening") + ", Navjo";
+document.getElementById("today-line").textContent =
+  "Riverside Medical Center · " +
+  new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+</script>
+</body>
+</html>
