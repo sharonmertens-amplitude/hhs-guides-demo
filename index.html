@@ -193,7 +193,7 @@ tbody tr:hover{background:#fbfaff}
   <main>
     <div class="page-head">
       <div>
-        <h1 id="greeting">Good morning, Navjo</h1>
+        <h1 id="greeting">Good morning, Sam Rivera</h1>
         <p id="today-line">Riverside Medical Center · Friday, June 5</p>
       </div>
       <div class="actions">
@@ -396,7 +396,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
 // Time-of-day greeting
 const h = new Date().getHours();
 document.getElementById("greeting").textContent =
-  (h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening") + ", Navjo";
+  (h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening") + ", Sam Rivera";
 document.getElementById("today-line").textContent =
   "Riverside Medical Center · " +
   new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
